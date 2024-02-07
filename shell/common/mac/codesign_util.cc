@@ -105,6 +105,10 @@ bool ProcessSignatureIsSameWithCurrentApp(pid_t pid) {
   // Check whether the process meets the signature requirement of current app.
   status = SecCodeCheckValidity(process_code.get(), kSecCSDefaultFlags,
                                 self_requirement.get());
+  if (status == errSecCSUnsigned) {
+    // Process is not signed, no need to validate as it has full permission.
+    return true;
+  }
   if (status != errSecSuccess && status != errSecCSReqFailed) {
     OSSTATUS_LOG(ERROR, status) << "SecCodeCheckValidity";
     return false;
